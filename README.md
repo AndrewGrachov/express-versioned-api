@@ -11,10 +11,16 @@ So enjoy.. If you found a bug, please open appropriate issue.
 
 #So what should I do?
 
-Install it. clone it with git and then run
+Install it, then run it. clone it with git and then run
 
 ```
 npm install
+```
+
+To run it
+
+```
+node app
 ```
 
 You should also have mongo server up and running on 127.0.0.1:27017, otherwise you can change path in config.
