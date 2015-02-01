@@ -18,11 +18,6 @@ module.exports = {
 			format: 'date-time',
 			description: 'Pocket creation date. readonly',
 			readonly: true
-		},
-		users: {
-			type: 'array',
-			readonly: true,
-			items: user
 		}
 	}
 };

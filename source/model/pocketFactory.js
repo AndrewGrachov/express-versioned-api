@@ -7,6 +7,7 @@ var config = require('config');
 var entities = {
 	entity: function (pocket) {
 		var pocketEntity = {
+			id: pocket._id,
 			name: pocket.data.name,
 			createdAt: pocket.createdAt
 		};
@@ -15,8 +16,14 @@ var entities = {
 		return pocketEntity;
 	},
 	entity_v2: function (pocket) {
-		var pocketEntity = pocket.data;
-		pocketEntity.id = pocket._id;
+		var pocketEntity = {
+			id: pocket._id,
+			createdAt: pocket.createdAt,
+			name: pocket.data.name,
+			amount: pocket.data.amount || 0,
+			notes: pocket.data.notes || ''
+		};
+
 		return pocketEntity;
 	}
 };
@@ -33,11 +40,27 @@ function pocketFactory(mongo) {
 		},
 		updatePocket: function (id, data, callback) {
 			id = ObjectId(id);
-			mongo('pockets').findAndModify({_id: id}, [], {$set: {data: data}}, {new: true}, callback);
+			mongo('pockets').findAndModify({_id: id}, [], {$set: {data: data}}, {new: true}, function (err, pocket) {
+				if (err) {
+					return callback(err);
+				}
+				if (!pocket) {
+					return callback(errors.notFound('pocket'));
+				}
+				return callback(err, pocket);
+			});
 		},
 		removePocket: function (id, callback) {
 			id = ObjectId(id);
-			mongo('pockets').remove({_id: id}, callback);
+			mongo('pockets').findAndModify({_id: id}, [], {}, {remove: true}, function (err, pocket) {
+				if (err) {
+					return callback(err);
+				}
+				if(!pocket) {
+					return callback(errors.notFound('pocket'));
+				}
+				return callback(err, pocket);
+			});
 		},
 		getPocketById: function (id, options, callback) {
 			if (!callback) {

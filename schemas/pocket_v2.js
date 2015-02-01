@@ -21,15 +21,11 @@ module.exports = {
 		},
 		amount: {
 			type: 'number',
-			description: 'Some amount?'
+			description: 'Some amount?',
+			required: true
 		},
 		note: {
 			type: 'string'
-		},
-		users: {
-			type: 'array',
-			readonly: true,
-			items: user
 		}
 	}
 };

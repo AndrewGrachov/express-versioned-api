@@ -3,7 +3,7 @@ var schemagic = require('schemagic');
 var validateSchema = require(ROOT + '/source/middleware/validate');
 var validateListParams = require(ROOT + '/source/middleware/validateListParams');
 var validateObjectId = require(ROOT + '/source/middleware/validateObjectId');
-var listResponse = require(ROOT + '/source/middleware/listResponse');
+var listResponse = require(ROOT + '/source/middleware/plainArrayResponse');
 var mapStream = require('map-stream');
 
 module.exports = function (app) {
@@ -16,7 +16,7 @@ module.exports = function (app) {
 					return next(err);
 				}
 				var pipe = result.stream.pipe(mapStream(function (pocket, callback) {
-					return callback(null, pocketFactory.transform('pocket_v2', pocket));
+					return callback(null, pocketFactory.transform('entity_v2', pocket));
 				}));
 				return listResponse({stream: pipe, count: result.count}, req, res, next);
 			});
@@ -28,7 +28,7 @@ module.exports = function (app) {
 			if (err) {
 				return next(err);
 			}
-			return pocketFactory.transform('pocket_v2', pocket);
+			return pocketFactory.transform('entity_v2', pocket);
 		});
 	});
 	app.post('/api/v2/pockets',
