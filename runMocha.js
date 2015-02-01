@@ -4,7 +4,7 @@ var exec = require('child_process').fork,
 child = exec('./app.js');
 child.on('message', function (msg) {
 	if (msg === 'online') {
-		var mocha = require('child_process').exec('mocha --reporter spec --ui bdd -c', function (err, stdout, stderr) {
+		var mocha = require('child_process').exec('mocha --reporter spec --ui bdd -c', function (err, stdout) {
 			child.kill();
 			if (err) {
 				console.log('error:', err);

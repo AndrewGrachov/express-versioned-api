@@ -7,7 +7,7 @@
     "test": "node ./runMocha.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "GPL2.0",
   "dependencies": {
     "JSONStream": "^0.10.0",
     "async": "^0.9.0",
@@ -16,6 +16,7 @@
     "config": "^1.10.0",
     "express": "^4.11.1",
     "map-stream": "0.0.5",
+    "mocha-jshint": "0.0.9",
     "mongodb": "^1.4.29",
     "nodeerrors": "^2.1.0",
     "schemagic": "^1.6.4",

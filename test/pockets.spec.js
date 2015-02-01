@@ -70,13 +70,12 @@ describe('when testing pockets api', function () {
 		});
 
 		describe('when joining pocket', function () {
-			var joinResponse, contextUserId;
+			var joinResponse;
 			before(function (done) {
 				request
 					.post(testConfig.server.url + '/api/v1/pockets/' + pocket.id + '/users')
 					.end(function (res) {
 						joinResponse = res.body;
-						console.log('join response:', joinResponse);
 						done();
 					});
 			});
@@ -223,12 +222,11 @@ describe('when testing pockets api', function () {
 					});
 				});
 				describe('when joining pocket', function () {
-					var joinResponse, contextUserId;
+					var joinResponse;
 					before(function (done) {
 						request
 							.post(testConfig.server.url + '/api/v2/pockets/' + pocket.id + '/users')
 							.end(function (res) {
-								console.log('join v2 error:', res.error);
 								joinResponse = res.body;
 								done();
 							});

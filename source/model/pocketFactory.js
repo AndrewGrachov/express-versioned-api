@@ -28,9 +28,9 @@ var entities = {
 		return pocketEntity;
 	},
 	pocketUser: function (pocketUser) {
-		var pocketUser = userFactory.transform('entity', pocketUser.user);
-		pocketUser.joined = pocketUser.createdAt;
-		return pocketUser;
+		var pocketUserEntity = userFactory.transform('entity', pocketUser.user);
+		pocketUserEntity.joined = pocketUser.joined;
+		return pocketUserEntity;
 	}
 };
 
@@ -81,7 +81,7 @@ function pocketFactory(mongo) {
 					return callback(err);
 				}
 				if (!pocket) {
-					return callback(errors.notFound('pocket'))
+					return callback(errors.notFound('pocket'));
 				}
 				return mongo('users').find({_id: {$in: pocket.users}}, callback);
 			}
@@ -155,15 +155,15 @@ function pocketFactory(mongo) {
 				}
 				if (!pocketUser) {
 					return mongo('pockets').findOne({_id: pocketId}, checkPocket);
-					function checkPocket(err, pocket) {
-						if (err) {
-							return callback(err);
-						}
-						if (!pocket) {
-							return errors.notFound('pocket');
-						}
-						return errors.invalidOperation('not in this pocket');
+				}
+				function checkPocket(err, pocket) {
+					if (err) {
+						return callback(err);
 					}
+					if (!pocket) {
+						return errors.notFound('pocket');
+					}
+					return errors.invalidOperation('not in this pocket');
 				}
 				return callback();
 			});
@@ -209,12 +209,12 @@ function pocketFactory(mongo) {
 					};
 
 					var pipe = stream.pipe(mapStream(fetchUser));
-					return callback(null, {count: count, stream: pipe})
+					return callback(null, {count: count, stream: pipe});
 				}
 			], callback);
 		}
-	}
-};
+	};
+}
 
 pocketFactory.transform = function (type, pocket) {
 	if (!entities[type]) {

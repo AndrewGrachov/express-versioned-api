@@ -11,5 +11,5 @@ module.exports = function (param) {
 				return next(errors.InvalidObjectId(param));
 			}
 			next();
-		}
+		};
 	};

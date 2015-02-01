@@ -1,5 +1,4 @@
 var pocketFactory = require(ROOT + '/source/model/pocketFactory');
-var schemagic = require('schemagic');
 var validateSchema = require(ROOT + '/source/middleware/validate');
 var validateListParams = require(ROOT + '/source/middleware/validateListParams');
 var validateObjectId = require(ROOT + '/source/middleware/validateObjectId');
@@ -115,4 +114,4 @@ module.exports = function (app) {
 			});
 		}
 	);
-}
+};

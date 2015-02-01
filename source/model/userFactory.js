@@ -3,7 +3,6 @@ var entities = {
 		var userEntity = {
 			id: user._id,
 			email: user.data.email,
-			createdAt: user.data.createdAt,
 			avatarUrl: user.data.avatarUrl,
 			createdAt: user.createdAt
 		};
@@ -11,7 +10,7 @@ var entities = {
 	}
 };
 
-function userFactory(mongo) {
+function userFactory() {
 
 }
 
