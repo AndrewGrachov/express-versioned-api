@@ -21,5 +21,10 @@ module.exports = {
 		message: 'Invalid parameter \"%s\". %s',
 		http: 409,
 		args: ['parameterName', 'reason']
+	},
+	'invalidOperation': {
+		message: 'Invalid operation: %s',
+		http: 422,
+		args: ['message']
 	}
 };

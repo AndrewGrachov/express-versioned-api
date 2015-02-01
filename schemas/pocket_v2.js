@@ -1,5 +1,3 @@
-var user = require('./pocket_user.js');
-
 module.exports = {
 	type: 'object',
 	properties: {

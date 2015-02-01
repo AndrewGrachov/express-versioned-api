@@ -68,6 +68,71 @@ describe('when testing pockets api', function () {
 				expect(listResponse.items[0]).to.have.property('createdAt');
 			});
 		});
+
+		describe('when joining pocket', function () {
+			var joinResponse, contextUserId;
+			before(function (done) {
+				request
+					.post(testConfig.server.url + '/api/v1/pockets/' + pocket.id + '/users')
+					.end(function (res) {
+						joinResponse = res.body;
+						console.log('join response:', joinResponse);
+						done();
+					});
+			});
+
+			it('should join successfully', function () {
+				expect(joinResponse).to.have.property('success').equal(true);
+			});
+
+			describe('when retrieving pocket users', function () {
+				var pocketUsersResponse;
+				before(function (done) {
+					request
+						.get(testConfig.server.url + '/api/v1/pockets/' + pocket.id + '/users')
+						.end(function (res) {
+							pocketUsersResponse = res.body;
+							done();
+						});
+				});
+				it('should return 1 user', function () {
+					expect(pocketUsersResponse).to.have.property('items').to.be.an('array');
+					expect(pocketUsersResponse.items).to.have.length(1);
+				});
+				it('should return pocket user info', function () {
+					var pocketUser = pocketUsersResponse.items[0];
+					expect(pocketUser.joined).to.be.a('string');
+					expect(pocketUser).to.have.property('email');
+					expect(pocketUser).to.have.property('id');
+					expect(pocketUser).to.have.property('avatarUrl');
+				});
+			});
+
+			describe('when leaving pocket', function () {
+				var leavePocketResponse, contextUserId;
+				before(function (done) {
+					request
+						.get(testConfig.server.url + '/api/v1/pockets/' + pocket.id + '/users')
+						.end(function (res) {
+							contextUserId = res.body.items[0].id;
+							done();
+						});
+				});
+				before(function (done) {
+					request
+						.del(testConfig.server.url + '/api/v1/pockets/' + pocket.id + '/users?userId=' + contextUserId)
+						.end(function (res) {
+							leavePocketResponse = res.body;
+							done();
+						});
+				});
+				it('should leave pocket', function () {
+					expect(leavePocketResponse).to.have.property('success').equal(true);
+				});
+			});
+		});
+
+
 		describe('when removing pocket', function () {
 			var removeResponse;
 			before(function (done) {
@@ -155,6 +220,68 @@ describe('when testing pockets api', function () {
 						expect(listResponse[0]).to.have.property('amount');
 						expect(listResponse[0]).to.have.property('notes');
 						expect(listResponse[0]).to.have.property('createdAt');
+					});
+				});
+				describe('when joining pocket', function () {
+					var joinResponse, contextUserId;
+					before(function (done) {
+						request
+							.post(testConfig.server.url + '/api/v2/pockets/' + pocket.id + '/users')
+							.end(function (res) {
+								console.log('join v2 error:', res.error);
+								joinResponse = res.body;
+								done();
+							});
+					});
+
+					it('should join successfully', function () {
+						expect(joinResponse).to.have.property('success').equal(true);
+					});
+
+					describe('when retrieving pocket users', function () {
+						var pocketUsersResponse;
+						before(function (done) {
+							request
+								.get(testConfig.server.url + '/api/v2/pockets/' + pocket.id + '/users')
+								.end(function (res) {
+									pocketUsersResponse = res.body;
+									done();
+								});
+						});
+						it('should return 1 user', function () {
+							expect(pocketUsersResponse).to.be.an('array');
+							expect(pocketUsersResponse).to.have.length(1);
+						});
+						it('should return pocket user info', function () {
+							var pocketUser = pocketUsersResponse[0];
+							expect(pocketUser.joined).to.be.a('string');
+							expect(pocketUser).to.have.property('email');
+							expect(pocketUser).to.have.property('id');
+							expect(pocketUser).to.have.property('avatarUrl');
+						});
+					});
+
+					describe('when leaving pocket', function () {
+						var leavePocketResponse, contextUserId;
+						before(function (done) {
+							request
+								.get(testConfig.server.url + '/api/v2/pockets/' + pocket.id + '/users')
+								.end(function (res) {
+									contextUserId = res.body[0].id;
+									done();
+								});
+						});
+						before(function (done) {
+							request
+								.del(testConfig.server.url + '/api/v2/pockets/' + pocket.id + '/users?userId=' + contextUserId)
+								.end(function (res) {
+									leavePocketResponse = res.body;
+									done();
+								});
+						});
+						it('should leave pocket', function () {
+							expect(leavePocketResponse).to.have.property('success').equal(true);
+						});
 					});
 				});
 				describe('when removing pocket', function () {

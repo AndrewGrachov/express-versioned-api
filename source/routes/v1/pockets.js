@@ -5,6 +5,7 @@ var validateListParams = require(ROOT + '/source/middleware/validateListParams')
 var validateObjectId = require(ROOT + '/source/middleware/validateObjectId');
 var listResponse = require(ROOT + '/source/middleware/listResponse');
 var mapStream = require('map-stream');
+var ObjectId = require('mongodb').ObjectID;
 
 module.exports = function (app) {
 	app.get('/api/v1/pockets',
@@ -47,7 +48,6 @@ module.exports = function (app) {
 			validateObjectId('pocketId'),
 			function (req, res, next) {
 				var id = req.params.pocketId;
-				console.log('before putting pocket');
 				pocketFactory(req.mongo).updatePocket(id, req.body, function (err, pocket) {
 					if (err) {
 						console.log('error:', err);
@@ -69,10 +69,50 @@ module.exports = function (app) {
 			}
 		);
 
-	app.post('/api/v1/pockets/:pocketId/user', function () {
-		return res.send({fakeJoin: true});
-	});
-	app.delete('/api/v1/pockets/:pocketId/user', function () {
-		return res.send({fakeLeave: true});
-	});
+	app.post('/api/v1/pockets/:pocketId/users',
+		validateSchema('empty'),
+		validateObjectId('pocketId'),
+		function (req, res, next) {
+			//emulate logged user
+			var user = {
+				id: new ObjectId(),
+				avatarUrl: 'http://fake-avatars.com/12.png',
+				email: 'fakeEmail@email.com'
+			};
+
+			pocketFactory(req.mongo).joinPocket(req.params.pocketId, user, function (err) {
+				if (err) {
+					return next(err);
+				}
+				return res.send({success: true});
+			});
+		}
+	);
+
+	app.delete('/api/v1/pockets/:pocketId/users', 
+		function (req, res, next) {
+			var userId = req.query.userId; //emulating logged user
+			pocketFactory(req.mongo).leavePocket(req.params.pocketId, userId, function (err) {
+				if (err) {
+					return next(err);
+				}
+				return res.send({success: true});
+			});
+		}
+	);
+	app.get('/api/v1/pockets/:pocketId/users', 
+		validateObjectId('pocketId'),
+		function (req, res, next) {
+			pocketFactory(req.mongo).getPocketUsers(req.params.pocketId, function (err, result) {
+				if (err) {
+					return next(err);
+				}
+				var pipe = result.stream.pipe(mapStream(function (pocketUser, callback) {
+					var pocketUserEntity = pocketFactory.transform('pocketUser', pocketUser);
+					return callback(null, pocketUserEntity);
+				}));
+				return listResponse({stream: pipe, count: result.count}, req, res, next);
+			});
+		}
+	);
 }

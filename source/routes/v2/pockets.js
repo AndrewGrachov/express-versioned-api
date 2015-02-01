@@ -5,6 +5,7 @@ var validateListParams = require(ROOT + '/source/middleware/validateListParams')
 var validateObjectId = require(ROOT + '/source/middleware/validateObjectId');
 var listResponse = require(ROOT + '/source/middleware/plainArrayResponse');
 var mapStream = require('map-stream');
+var ObjectId = require('mongodb').ObjectID;
 
 module.exports = function (app) {
 	app.get('/api/v2/pockets',
@@ -67,10 +68,49 @@ module.exports = function (app) {
 			}
 		);
 
-	app.post('/api/v2/pockets/:pocketId/user', function () {
-		return res.send({fakeJoin: true});
-	});
-	app.delete('/api/v2/pockets/:pocketId/user', function () {
-		return res.send({fakeLeave: true});
-	});
+	app.post('/api/v2/pockets/:pocketId/users',
+		validateObjectId('pocketId'),
+		function (req, res, next) {
+			//emulate logged user
+			var user = {
+				id: new ObjectId(),
+				avatarUrl: 'http://fake-avatars.com/12.png',
+				email: 'fakeEmail@email.com'
+			};
+
+			pocketFactory(req.mongo).joinPocket(req.params.pocketId, user, function (err) {
+				if (err) {
+					return next(err);
+				}
+				return res.send({success: true});
+			});
+		}
+	);
+
+	app.delete('/api/v2/pockets/:pocketId/users', 
+		function (req, res, next) {
+			var userId = req.query.userId;
+			pocketFactory(req.mongo).leavePocket(req.params.pocketId, userId, function (err) {
+				if (err) {
+					return next(err);
+				}
+				return res.send({success: true});
+			});
+		}
+	);
+	app.get('/api/v2/pockets/:pocketId/users', 
+		validateObjectId('pocketId'),
+		function (req, res, next) {
+			pocketFactory(req.mongo).getPocketUsers(req.params.pocketId, function (err, result) {
+				if (err) {
+					return next(err);
+				}
+				var pipe = result.stream.pipe(mapStream(function (pocketUser, callback) {
+					var pocketUserEntity = pocketFactory.transform('pocketUser', pocketUser);
+					return callback(null, pocketUserEntity);
+				}));
+				return listResponse({stream: pipe, count: result.count}, req, res, next);
+			});
+		}
+	);
 }
