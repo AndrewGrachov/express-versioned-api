@@ -1,0 +1,35 @@
+var user = require('./pocket_user.js');
+
+module.exports = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+			description: 'pocket id. readonly',
+			readonly: true,
+			example: ''
+		},
+		name: {
+			type: 'string',
+			required: true
+		},
+		createdAt: {
+			type: 'string',
+			format: 'date-time',
+			description: 'Pocket creation date. readonly',
+			readonly: true
+		},
+		amount: {
+			type: 'number',
+			description: 'Some amount?'
+		},
+		note: {
+			type: 'string'
+		},
+		users: {
+			type: 'array',
+			readonly: true,
+			items: user
+		}
+	}
+};
